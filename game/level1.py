@@ -1,9 +1,10 @@
-import pygame, sys # import pygame and sys
+import pygame, sys, csv # import pygame and sys
+from Player import Player
 
 clock = pygame.time.Clock() # set up the clock
 
 from pygame.locals import * # import pygame modules
-import os
+import os, random
 pygame.init() # initiate pygame
 
 pygame.display.set_caption('Pygame Window') # set the window name
@@ -21,6 +22,7 @@ TILE_SIZE = grass_image.get_width()
 dirt_image = pygame.image.load("imgs/dirt.png")
 stone_image = pygame.image.load("imgs/stone_2.png")
 stone_image_2 = pygame.image.load("imgs/stone_3.png")
+coin = pygame.image.load("imgs/coin.png")
 #images
 
 # functions
@@ -68,48 +70,20 @@ def move(rect, movement, tiles):
 
 # functions
 
-class Inherit:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.img = None
-    
-    def draw(self, window):
-        window.blit(self.img, (self.x, self.y))
-
-    def get_width(self):
-        return self.img.get_width()
-
-    def get_height(self):
-        return self.img.get_height()
-
-class Player(Inherit):
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.img = player_image
-        self.mask = pygame.mask.from_surface(self.img)
-        self.right = False
-        self.left = False
-        self.momentum = 0
-        self.air_timer = 0
-        self.walkCount = 0
-        self.flip = False
-
 
 # variables
-moving_right = False
-moving_left = False
-player_y_momentum = 0
-air_timer = 0
 player_rect = pygame.Rect(50, 50, player_image.get_width(), player_image.get_height())
 test_rect = pygame.Rect(100,100,100,50)
-player = Player(50, 50)
+player = Player(50, 50, player_image)
 game_map = load_map('map1')
 true_scroll = [0, 0]
+particles = []
 # variables
 
+# game
 while True: # game loop
     display.fill((146,244,255))
+
 
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20
     true_scroll[1] += (player_rect.y-true_scroll[1]-106)/20
@@ -127,8 +101,11 @@ while True: # game loop
                 display.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile == '2':
                 display.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+            if tile == '3':
+                display.blit(coin, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+           
             x += 1
         y += 1
 
@@ -154,6 +131,17 @@ while True: # game loop
 
     display.blit(player_image, (player_rect.x-scroll[0], player_rect.y-scroll[1]))
 
+    # particles.append([[player.x, player.y], [random.randint(0, 5) / 2 - 1, 1], random.randint(4,6)])
+
+    # for particle in particles:
+    #     particle[0][0] += particle[1][0]
+    #     particle[0][1] += particle[1][1]
+    #     particle[2] -= 0.01
+    #     pygame.draw.circle(display, (255, 0, 0), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+
+    #     if particle[2] <= 0:
+    #         particles.remove(particle)
+
     for event in pygame.event.get(): # event loop
         if event.type == QUIT: # check for window quit
             pygame.quit() # stop pygame
@@ -176,3 +164,12 @@ while True: # game loop
     screen.blit(surf, (0, 0))
     pygame.display.update() # update display
     clock.tick(60) # maintain 60 fps
+
+
+
+# game
+
+
+# main menu
+
+# main menu
