@@ -16,13 +16,11 @@ display = pygame.Surface((300, 200))
 
 #images
 player_image = pygame.image.load("player_animations/idle/idle_0.png")
-#player_idle = [pygame.image.load("player_animations/idle/idle_0.png"), pygame.image.load("player_animations/idle/idle_1.png")]
-#player_run = [pygame.image.load("player_animations/run/player_0.png"), pygame.image.load("player_animations/run/player_1.png")]
-# player_image.set_colorkey((255, 255, 255))
 grass_image = pygame.image.load("imgs/grass.png")
 TILE_SIZE = grass_image.get_width()
 dirt_image = pygame.image.load("imgs/dirt.png")
-stone_image = pygame.image.load("imgs/stone.png")
+stone_image = pygame.image.load("imgs/stone_2.png")
+stone_image_2 = pygame.image.load("imgs/stone_3.png")
 #images
 
 # functions
@@ -126,9 +124,9 @@ while True: # game loop
         x = 0
         for tile in row:
             if tile == '1':
-                display.blit(dirt_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+                display.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile == '2':
-                display.blit(grass_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+                display.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
             x += 1
