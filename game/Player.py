@@ -10,5 +10,7 @@ class Player(Inherit):
         self.left = False
         self.momentum = 0
         self.air_timer = 0
-        self.walkCount = 0
+        self.flip = False
+        self.action = 'idle'
+        self.frame = 0
         self.flip = False

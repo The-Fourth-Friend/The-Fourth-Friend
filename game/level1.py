@@ -1,9 +1,10 @@
 import pygame, sys, csv # import pygame and sys
 from Player import Player
-
+from tiles import *
 clock = pygame.time.Clock() # set up the clock
 
 from pygame.locals import * # import pygame modules
+# from pygame_functions import *
 import os, random
 pygame.init() # initiate pygame
 
@@ -11,11 +12,13 @@ pygame.display.set_caption('Pygame Window') # set the window name
 
 WINDOW_SIZE = (600,400) # set up window size
 
-screen = pygame.display.set_mode(WINDOW_SIZE,0,32) # initiate screen
+screen = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE) # initiate screen
 
 display = pygame.Surface((300, 200))
 
 #images
+# player_image = pygame.image.load("player_animations/player_idle.gif").convert()
+
 player_image = pygame.image.load("player_animations/idle/idle_0.png")
 grass_image = pygame.image.load("imgs/grass.png")
 TILE_SIZE = grass_image.get_width()
@@ -75,14 +78,15 @@ def move(rect, movement, tiles):
 player_rect = pygame.Rect(50, 50, player_image.get_width(), player_image.get_height())
 test_rect = pygame.Rect(100,100,100,50)
 player = Player(50, 50, player_image)
-game_map = load_map('map1')
+game_map = load_map('level1')
 true_scroll = [0, 0]
 particles = []
 # variables
 
 # game
-while True: # game loop
-    display.fill((146,244,255))
+running = True
+while running: # game loop
+    display.fill((146,0,255))
 
 
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20
@@ -131,21 +135,16 @@ while True: # game loop
 
     display.blit(player_image, (player_rect.x-scroll[0], player_rect.y-scroll[1]))
 
-    # particles.append([[player.x, player.y], [random.randint(0, 5) / 2 - 1, 1], random.randint(4,6)])
-
-    # for particle in particles:
-    #     particle[0][0] += particle[1][0]
-    #     particle[0][1] += particle[1][1]
-    #     particle[2] -= 0.01
-    #     pygame.draw.circle(display, (255, 0, 0), [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-
-    #     if particle[2] <= 0:
-    #         particles.remove(particle)
 
     for event in pygame.event.get(): # event loop
         if event.type == QUIT: # check for window quit
+            running = False
             pygame.quit() # stop pygame
             sys.exit() # stop script
+
+        if event.type == VIDEORESIZE:
+            screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 player.right = True
@@ -154,6 +153,7 @@ while True: # game loop
             if event.key == K_UP:
                 if player.air_timer < 6:
                     player.momentum = -5
+
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 player.right = False
