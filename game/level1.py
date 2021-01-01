@@ -1,6 +1,7 @@
 import pygame, sys, csv # import pygame and sys
 from Player import Player
 from tiles import *
+from load_map import load_map
 clock = pygame.time.Clock() # set up the clock
 
 from pygame.locals import * # import pygame modules
@@ -8,11 +9,12 @@ from pygame.locals import * # import pygame modules
 import os, random
 pygame.init() # initiate pygame
 
-pygame.display.set_caption('Pygame Window') # set the window name
-
+pygame.display.set_caption('The Fourth Friend') # set the window name
+favicon = pygame.image.load("logo.png")
+pygame.display.set_icon(favicon)
 WINDOW_SIZE = (600,400) # set up window size
 
-screen = pygame.display.set_mode(WINDOW_SIZE, pygame.RESIZABLE) # initiate screen
+screen = pygame.display.set_mode(WINDOW_SIZE, RESIZABLE) # initiate screen
 
 display = pygame.Surface((300, 200))
 
@@ -29,17 +31,6 @@ coin = pygame.image.load("imgs/coin.png")
 #images
 
 # functions
-
-def load_map(path):
-    f = open(path + '.txt', 'r')
-    data = f.read()
-    f.close()
-    data = data.split('\n')
-    game_map = []
-    for row in data:
-        game_map.append(list(row))
-
-    return game_map
 
 def collision_test(rect, tiles):
     hit_list = []
@@ -81,6 +72,7 @@ player = Player(50, 50, player_image)
 game_map = load_map('level1')
 true_scroll = [0, 0]
 particles = []
+fullscreen = False
 # variables
 
 # game
@@ -143,7 +135,9 @@ while running: # game loop
             sys.exit() # stop script
 
         if event.type == VIDEORESIZE:
-            screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            if not fullscreen:
+                screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+                display = pygame.Surface((event.w, event.h), RESIZABLE)
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
@@ -153,6 +147,16 @@ while running: # game loop
             if event.key == K_UP:
                 if player.air_timer < 6:
                     player.momentum = -5
+            if event.key == K_f:
+                fullscreen = not fullscreen
+                if fullscreen:
+                        screen = pygame.display.set_mode((screen.get_width(), screen.get_height()), FULLSCREEN)
+                        display = pygame.Surface((screen.get_width(), screen.get_height()), FULLSCREEN)
+                else:
+                     screen = pygame.display.set_mode((screen.get_width(), screen.get_height()), pygame.RESIZABLE)
+                     display = pygame.Surface((screen.get_width(), screen.get_height()), pygame.RESIZABLE)
+
+
 
         if event.type == KEYUP:
             if event.key == K_RIGHT:
