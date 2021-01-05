@@ -18,12 +18,13 @@ screen = pygame.display.set_mode(WINDOW_SIZE, RESIZABLE) # initiate screen
 
 display = pygame.Surface((300, 200))
 
-#images
-# player_image = pygame.image.load("player_animations/player_idle.gif").convert()
 
-player_image = pygame.image.load("player_animations/idle/idle_0.png")
+
+#images
+player_run = [pygame.image.load("player_animations/run/run_0.png"),pygame.image.load("player_animations/run/run_1.png"),pygame.image.load("player_animations/run/run_2.png")]
+player_idle = [pygame.image.load("player_animations/idle/idle_2.png"), pygame.image.load("player_animations/idle/idle_1.png"),pygame.image.load("player_animations/idle/idle_2.png")]
 grass_image = pygame.image.load("imgs/grass.png")
-TILE_SIZE = grass_image.get_width()
+TILE_SIZE = 32
 dirt_image = pygame.image.load("imgs/dirt.png")
 stone_image = pygame.image.load("imgs/stone_2.png")
 stone_image_2 = pygame.image.load("imgs/stone_3.png")
@@ -66,19 +67,19 @@ def move(rect, movement, tiles):
 
 
 # variables
-player_rect = pygame.Rect(50, 50, player_image.get_width(), player_image.get_height())
-test_rect = pygame.Rect(100,100,100,50)
-player = Player(50, 50, player_image)
-game_map = load_map('level1')
+player_rect = pygame.Rect(50, 50, 32, 32)
+player = Player(50, 50)
+game_map = load_map('map1')
 true_scroll = [0, 0]
-particles = []
 fullscreen = False
 # variables
 
 # game
 running = True
 while running: # game loop
-    display.fill((146,0,255))
+    screen.fill((146,0,255))
+    if player.walk_count + 1 >= 15:
+        player.walk_count = 0
 
 
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20
@@ -94,11 +95,9 @@ while running: # game loop
         x = 0
         for tile in row:
             if tile == '1':
-                display.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+                screen.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile == '2':
-                display.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
-            if tile == '3':
-                display.blit(coin, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+                screen.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
            
@@ -108,16 +107,25 @@ while running: # game loop
 # movement
     player_movement = [0, 0]
     if player.right:
-        player_movement[0] += 2
-    if player.left:
-        player_movement[0] -= 2
+        player_movement[0] += 3
+        screen.blit(player_run[player.walk_count//5], (player_rect.x-scroll[0], player_rect.y-scroll[1]))
+        player.walk_count += 1
+    elif player.left:
+        player_movement[0] -= 3
+        screen.blit(pygame.transform.flip(player_run[player.walk_count//5], True, False), (player_rect.x-scroll[0], player_rect.y-scroll[1]))
+        player.walk_count += 1
+    else:           
+        screen.blit(player_idle[player.walk_count//5], (player_rect.x-scroll[0], player_rect.y-scroll[1]))
+
     player_movement[1] += player.momentum
     player.momentum += 0.2
     if player.momentum > 3:
         player.momentum = 3
+        
 # movement
 
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
+
 
     if collisions['bottom']:
         player.momentum = 0
@@ -125,8 +133,7 @@ while running: # game loop
     else:
         player.air_timer += 1
 
-    display.blit(player_image, (player_rect.x-scroll[0], player_rect.y-scroll[1]))
-
+    
 
     for event in pygame.event.get(): # event loop
         if event.type == QUIT: # check for window quit
@@ -144,9 +151,11 @@ while running: # game loop
                 player.right = True
             if event.key == K_LEFT:
                 player.left = True
+
             if event.key == K_UP:
-                if player.air_timer < 6:
-                    player.momentum = -5
+                player.walk_count = 0
+                if player.air_timer < 8:
+                    player.momentum = -7
             if event.key == K_f:
                 fullscreen = not fullscreen
                 if fullscreen:
@@ -164,16 +173,11 @@ while running: # game loop
             if event.key == K_LEFT:
                 player.left = False
 
-    surf = pygame.transform.scale(display, WINDOW_SIZE)
-    screen.blit(surf, (0, 0))
+
+    
     pygame.display.update() # update display
     clock.tick(60) # maintain 60 fps
 
 
 
 # game
-
-
-# main menu
-
-# main menu
