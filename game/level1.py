@@ -29,9 +29,35 @@ dirt_image = pygame.image.load("imgs/dirt.png")
 stone_image = pygame.image.load("imgs/stone_2.png")
 stone_image_2 = pygame.image.load("imgs/stone_3.png")
 coin = pygame.image.load("imgs/coin.png")
+sword = pygame.image.load("imgs/sword.png")
 #images
 
+global animation_frames
+animation_frames = {}
+
 # functions
+
+def load_animations(path, frame_durations):
+    global animation_frames
+    animation_name = path.split('/')[-1]
+    animation_frame_data = []
+    n = 0
+    for frame in frame_durations:
+        animation_frame_id = animation_name + '_' + str(n)
+        img_loc = path + '/' + animation_frame_id + '.png'
+        animation_image = pygame.image.load(img_loc)
+        animation_frames[animation_frame_id] = animation_image.copy()
+        for i in range(frame):
+            animation_frame_data.append(animation_frame_id)
+        n += 1
+    return animation_frame_data
+
+def change_action(action_var, frame, new_value):
+    if action_var != new_value:
+        action_var = new_value
+        frame = 0
+    return action_var, frame
+
 
 def collision_test(rect, tiles):
     hit_list = []
@@ -67,6 +93,9 @@ def move(rect, movement, tiles):
 
 
 # variables
+animation_database = {}
+animation_database['run'] = load_animations("player_animations/run", [7,7,7])
+animation_database['idle'] = load_animations("player_animations/idle", [7, 7, 40])
 player_rect = pygame.Rect(50, 50, 32, 32)
 player = Player(50, 50)
 game_map = load_map('map1')
@@ -98,6 +127,8 @@ while running: # game loop
                 screen.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile == '2':
                 screen.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
+            if tile == '3':
+                screen.blit(coin,  (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
            
@@ -108,23 +139,28 @@ while running: # game loop
     player_movement = [0, 0]
     if player.right:
         player_movement[0] += 3
-        screen.blit(player_run[player.walk_count//5], (player_rect.x-scroll[0], player_rect.y-scroll[1]))
-        player.walk_count += 1
-    elif player.left:
-        player_movement[0] -= 3
-        screen.blit(pygame.transform.flip(player_run[player.walk_count//5], True, False), (player_rect.x-scroll[0], player_rect.y-scroll[1]))
-        player.walk_count += 1
-    else:           
-        screen.blit(player_idle[player.walk_count//5], (player_rect.x-scroll[0], player_rect.y-scroll[1]))
-
+    if player.left:
+        player_movement[0] -= 3        
     player_movement[1] += player.momentum
     player.momentum += 0.2
     if player.momentum > 3:
         player.momentum = 3
+
+    if player_movement[0] > 0:
+        player.action, player.frame = change_action(player.action, player.frame, 'run')
+        player.flip = False
+
+    if player_movement[0] == 0:
+        player.action, player.frame = change_action(player.action, player.frame, 'idle')
+
+    if player_movement[0] < 0:
+        player.action, player.frame = change_action(player.action, player.frame, 'run')
+        player.flip = True
         
 # movement
 
     player_rect, collisions = move(player_rect, player_movement, tile_rects)
+    
 
 
     if collisions['bottom']:
@@ -133,18 +169,19 @@ while running: # game loop
     else:
         player.air_timer += 1
 
-    
+    player.frame += 1
+    if player.frame >= len(animation_database[player.action]):
+        player.frame = 0
+    player_img_id = animation_database[player.action][player.frame]
+    player_img = animation_frames[player_img_id]
+    screen.blit(pygame.transform.flip(player_img, player.flip, False), (player_rect.x-scroll[0], player_rect.y-scroll[1]))
+
 
     for event in pygame.event.get(): # event loop
         if event.type == QUIT: # check for window quit
             running = False
             pygame.quit() # stop pygame
             sys.exit() # stop script
-
-        if event.type == VIDEORESIZE:
-            if not fullscreen:
-                screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
-                display = pygame.Surface((event.w, event.h), RESIZABLE)
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
@@ -156,28 +193,14 @@ while running: # game loop
                 player.walk_count = 0
                 if player.air_timer < 8:
                     player.momentum = -7
-            if event.key == K_f:
-                fullscreen = not fullscreen
-                if fullscreen:
-                        screen = pygame.display.set_mode((screen.get_width(), screen.get_height()), FULLSCREEN)
-                        display = pygame.Surface((screen.get_width(), screen.get_height()), FULLSCREEN)
-                else:
-                     screen = pygame.display.set_mode((screen.get_width(), screen.get_height()), pygame.RESIZABLE)
-                     display = pygame.Surface((screen.get_width(), screen.get_height()), pygame.RESIZABLE)
-
-
 
         if event.type == KEYUP:
             if event.key == K_RIGHT:
                 player.right = False
             if event.key == K_LEFT:
                 player.left = False
-
-
     
     pygame.display.update() # update display
     clock.tick(60) # maintain 60 fps
-
-
 
 # game

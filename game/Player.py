@@ -13,3 +13,7 @@ class Player(Inherit):
         self.walk_count = 0
         self.idle = True
         self.run_count = 0
+        self.standing = True
+        self.action = 'idle'
+        self.frame = 0
+        self.flip = False
