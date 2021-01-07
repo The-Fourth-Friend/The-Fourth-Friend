@@ -14,11 +14,8 @@ favicon = pygame.image.load("logo.png")
 pygame.display.set_icon(favicon)
 WINDOW_SIZE = (600,400) # set up window size
 
+monitor_size = [pygame.display.Info().current_w, pygame.display.Info().current_h]
 screen = pygame.display.set_mode(WINDOW_SIZE, RESIZABLE) # initiate screen
-
-display = pygame.Surface((300, 200))
-
-
 
 #images
 player_run = [pygame.image.load("player_animations/run/run_0.png"),pygame.image.load("player_animations/run/run_1.png"),pygame.image.load("player_animations/run/run_2.png")]
@@ -98,7 +95,7 @@ animation_database['run'] = load_animations("player_animations/run", [7,7,7])
 animation_database['idle'] = load_animations("player_animations/idle", [7, 7, 40])
 player_rect = pygame.Rect(50, 50, 32, 32)
 player = Player(50, 50)
-game_map = load_map('map1')
+game_map = load_map('level1')
 true_scroll = [0, 0]
 fullscreen = False
 # variables
@@ -107,8 +104,6 @@ fullscreen = False
 running = True
 while running: # game loop
     screen.fill((146,0,255))
-    if player.walk_count + 1 >= 15:
-        player.walk_count = 0
 
 
     true_scroll[0] += (player_rect.x-true_scroll[0]-152)/20
@@ -183,6 +178,10 @@ while running: # game loop
             pygame.quit() # stop pygame
             sys.exit() # stop script
 
+        if event.type == VIDEORESIZE:
+            if not fullscreen:
+                screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
                 player.right = True
@@ -193,6 +192,13 @@ while running: # game loop
                 player.walk_count = 0
                 if player.air_timer < 8:
                     player.momentum = -7
+            
+            if event.key == K_f:
+                fullscreen = not fullscreen
+                if fullscreen:
+                    screen = pygame.display.set_mode((monitor_size), FULLSCREEN)
+                else:
+                    screen = pygame.display.set_mode((monitor_size), RESIZABLE)
 
         if event.type == KEYUP:
             if event.key == K_RIGHT:
