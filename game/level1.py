@@ -98,6 +98,8 @@ player = Player(50, 50)
 game_map = load_map('level1')
 true_scroll = [0, 0]
 fullscreen = False
+stone_image_opt = stone_image.copy()
+stone_image_2_opt = stone_image_2.copy()
 # variables
 
 # game
@@ -179,8 +181,9 @@ while running: # game loop
             sys.exit() # stop script
 
         if event.type == VIDEORESIZE:
-            if not fullscreen:
-                screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+                if not fullscreen:
+                    screen = pygame.display.set_mode((event.w, event.h), RESIZABLE)
+
 
         if event.type == KEYDOWN:
             if event.key == K_RIGHT:
@@ -197,6 +200,8 @@ while running: # game loop
                 fullscreen = not fullscreen
                 if fullscreen:
                     screen = pygame.display.set_mode((monitor_size), FULLSCREEN)
+                    pygame.transform.scale(stone_image_opt, (100, 100))
+                    pygame.transform.scale(stone_image_2_opt, (100, 100))
                 else:
                     screen = pygame.display.set_mode((monitor_size), RESIZABLE)
 
