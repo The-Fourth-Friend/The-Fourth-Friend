@@ -124,8 +124,6 @@ while running: # game loop
                 screen.blit(stone_image_2, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile == '2':
                 screen.blit(stone_image, (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
-            if tile == '3':
-                screen.blit(coin,  (x * TILE_SIZE-scroll[0], y * TILE_SIZE-scroll[1]))
             if tile != '0':
                 tile_rects.append(pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
            
